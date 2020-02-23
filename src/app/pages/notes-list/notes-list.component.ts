@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { Note } from '../../shared/note.model';
 import { NotesService } from 'src/app/shared/notes.service';
 import { trigger, transition, style, animate, query, stagger } from '@angular/animations';
@@ -81,16 +81,96 @@ import { trigger, transition, style, animate, query, stagger } from '@angular/an
 export class NotesListComponent implements OnInit {
 
   notes: Note[] = new Array<Note>();
+  filteredNotes: Note[] = new Array<Note>();
+
+  @ViewChild('filterInput', {static: true}) filterInputElmtRef: ElementRef;
+
   constructor(private notesService: NotesService) { }
 
   ngOnInit() {
     // get notes from notes service
     this.notes = this.notesService.getAll();
+    this.filter("");
 
   }
 
-  deleteNote(id: number) {
-    this.notesService.delete(id);
+  deleteNote(note: Note) {
+    let noteId = this.notesService.getId(note);
+    this.notesService.delete(noteId);
+    this.filter(this.filterInputElmtRef.nativeElement.value);
+  }
+
+  generateNoteUrl(note: Note) {
+    let noteId = this.notesService.getId(note);
+    return noteId;
+
+  }
+
+
+  filter(query: string) {
+    query = query.toLowerCase().trim();
+
+    let allResults: Note[] = new Array<Note>();
+    let terms: string[] = query.split(" "); // split on spaces
+    terms = this.removeDuplicates(terms);
+    terms.forEach(element => {
+      let results: Note[] = this.relevantNotes(element);
+      allResults = [...allResults, ...results];
+    });
+
+    let uniqueResults = this.removeDuplicates(allResults);
+    this.filteredNotes = uniqueResults;
+    this.sortByRelevancy(allResults);
+
+
+  }
+
+  removeDuplicates(arr: Array<any>) : any {
+    let uniqueResults: Set<any> = new Set<any>();
+    arr.forEach(e => uniqueResults.add(e));
+
+    return Array.from(uniqueResults);
+  }
+
+  relevantNotes(query: string): any {
+    query = query.toLowerCase().trim();
+    let relevantNotes = this.notes.filter(elmt => {
+      if (elmt.title && elmt.title.toLowerCase().includes(query)) {
+        return true;
+      }
+      if (elmt.body && elmt.body.toLowerCase().includes(query)) {
+        return true;
+      }
+      return false;
+    })
+
+    return relevantNotes
+  }
+
+  // determine relevancy of search query
+  sortByRelevancy(searchResults: Note[]) {
+    let noteCountObject: Object = {}; // noteId: number (note object id : count )
+
+    searchResults.forEach(note => {
+      let noteId = this.notesService.getId(note);
+      if (noteCountObject[noteId]) {
+        noteCountObject[noteId] += 1;
+      } else {
+        noteCountObject[noteId] = 1;
+      }
+    })
+
+    this.filteredNotes = this.filteredNotes.sort((a: Note, b: Note) => {
+      let aId = this.notesService.getId(a);
+      let bId = this.notesService.getId(b);
+
+      let aCount = noteCountObject[aId];
+      let bCount = noteCountObject[bId];
+
+      // more relevant at the top
+      return bCount - aCount;
+    })
+
   }
 
 }
