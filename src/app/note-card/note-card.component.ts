@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, ElementRef, Renderer2, Input } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef, Renderer2, Input, Output, EventEmitter } from '@angular/core';
 
 @Component({
   selector: 'app-note-card',
@@ -9,6 +9,9 @@ export class NoteCardComponent implements OnInit {
 
   @Input() title: string;
   @Input() body: string;
+  @Input() link: string;
+
+  @Output('delete') deleteEvent: EventEmitter<void> = new EventEmitter<void>();
 
   @ViewChild('truncator', {static: true}) truncator: ElementRef<HTMLElement>;
   @ViewChild('bodyText', {static: true}) bodyText: ElementRef<HTMLElement>;
@@ -16,7 +19,7 @@ export class NoteCardComponent implements OnInit {
   constructor(private renderer: Renderer2) { }
 
   ngOnInit() {
-    // if oveflow display truncator, else hide it
+    // if overflow display truncator, else hide it
     let style = window.getComputedStyle(this.bodyText.nativeElement, null);
     let viewableHeight = parseInt(style.getPropertyValue("height"), 10);
 
@@ -25,6 +28,10 @@ export class NoteCardComponent implements OnInit {
     } else {
       this.renderer.setStyle(this.truncator.nativeElement, 'display', 'none');
     }
+  }
+
+  onXButtonClick() {
+    this.deleteEvent.emit();
   }
 
 }

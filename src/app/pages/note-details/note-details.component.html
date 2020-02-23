@@ -3,7 +3,7 @@
     <div class="field">
       <label class="label">Title</label>
       <div class="control">
-        <input type="text" required class="input">
+        <input type="text" name="title" [ngModel]="note.title" required class="input">
       </div>
     </div>
 
@@ -12,19 +12,19 @@
     <div class="field">
       <label class="label">Body</label>
       <div class="control">
-        <textarea class="textarea"></textarea>
+        <textarea class="textarea" name="body" [ngModel]="note.body"></textarea>
       </div>
     </div>
 
 
     <div class="field is-grouped is-pulled-right">
       <div class="control">
-        <button class="button is-text" type="button">
+        <button class="button is-text" type="button" (click)="cancel()">
           cancel
         </button>
       </div>
       <div class="control">
-        <button class="button is-text is-primary" type="submit">
+        <button class="button is-text is-primary" type="submit" [disabled]="!noteForm.valid">
           save
         </button>
       </div>
