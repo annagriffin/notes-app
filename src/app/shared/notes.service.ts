@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Note } from './note.model';
+import { HttpClient } from '@angular/common/http';
 
 @Injectable({
   providedIn: 'root'
@@ -8,15 +9,19 @@ export class NotesService {
 
   notes: Note[] = new Array<Note>();
 
-  constructor() { }
+  constructor(private http: HttpClient) { }
+
+  getAll() {
+    return this.http.get<Note[]>('https://my-json-server.typicode.com/annagriffin/notes-app');
+  }
 
   get(id: number) {
     return this.notes[id];
   }
 
-  getAll() {
-    return this.notes;
-  }
+  // getAll() {
+  //   return this.notes;
+  // }
 
   getId(note: Note) {
     return this.notes.indexOf(note)
