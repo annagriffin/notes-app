@@ -13,6 +13,10 @@ export class NotesService {
 
   getAll() {
     // return this.http.get<Note[]>('https://my-json-server.typicode.com/annagriffin/notes-app');
+    fetch('https://my-json-server.typicode.com/annagriffin/notes-app/notes')
+      .then(response => response.json())
+      .then(json => this.notes = json)
+
     return this.notes;
   }
 
