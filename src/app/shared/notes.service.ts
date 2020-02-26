@@ -12,7 +12,8 @@ export class NotesService {
   constructor(private http: HttpClient) { }
 
   getAll() {
-    return this.http.get<Note[]>('https://my-json-server.typicode.com/annagriffin/notes-app');
+    // return this.http.get<Note[]>('https://my-json-server.typicode.com/annagriffin/notes-app');
+    return this.notes;
   }
 
   get(id: number) {
