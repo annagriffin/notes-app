@@ -7,17 +7,19 @@ import { HttpClient } from '@angular/common/http';
 })
 export class NotesService {
 
-  notes: Note[] = new Array<Note>();
+  notes;
+
 
   constructor(private http: HttpClient) { }
 
   getAll() {
-    // return this.http.get<Note[]>('https://my-json-server.typicode.com/annagriffin/notes-app');
-    fetch('https://my-json-server.typicode.com/annagriffin/notes-app/notes')
-      .then(response => response.json())
-      .then(json => this.notes = json)
+    // return this.http.get<Note[]>('https://my-json-server.typicode.com/annagriffin/notes-app/notes');
+    // fetch('https://my-json-server.typicode.com/annagriffin/notes-app/notes')
+    //   .then(response => response.json())
+    //   .then(json => this.notes = json)
+    return this.http.get('https://my-json-server.typicode.com/annagriffin/notes-app/notes');
 
-    return this.notes;
+    // return this.notes;
   }
 
   get(id: number) {
@@ -28,9 +30,9 @@ export class NotesService {
   //   return this.notes;
   // }
 
-  getId(note: Note) {
-    return this.notes.indexOf(note)
-  }
+  // getId(note: Note) {
+  //   return this.notes.indexOf(note)
+  // }
 
   add(note: Note) {
     let newLength = this.notes.push(note);
@@ -46,6 +48,7 @@ export class NotesService {
 
   delete(id: number) {
     // id and delete count
-    this.notes.splice(id, 1);
+    // this.notes.splice(id, 1);
+    return this.http.delete(`https://my-json-server.typicode.com/annagriffin/notes-app/notes/{${id}}`);
   }
 }

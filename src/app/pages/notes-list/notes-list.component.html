@@ -14,12 +14,13 @@
 
   <div class="notes-list" [@listAnim]>
     <app-note-card
-    *ngFor="let note of filteredNotes; index "
-    [link]="generateNoteUrl(note)"
+    *ngFor="let note of filteredNotes; "
+    [link]="generateNoteUrl(note.id)"
     [@itemAnim]
-    (delete)="deleteNote(note)"
+    (delete)="deleteNote(note.id)"
     [title]="note.title"
     [body]="note.body"></app-note-card>
+
 
 
   </div>

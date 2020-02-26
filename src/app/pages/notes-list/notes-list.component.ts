@@ -80,7 +80,7 @@ import { trigger, transition, style, animate, query, stagger } from '@angular/an
 })
 export class NotesListComponent implements OnInit {
 
-  notes: Note[] = new Array<Note>();
+  notes: Note[];
   filteredNotes: Note[] = new Array<Note>();
 
   @ViewChild('filterInput', {static: true}) filterInputElmtRef: ElementRef;
@@ -89,38 +89,52 @@ export class NotesListComponent implements OnInit {
 
   ngOnInit() {
     // get notes from notes service
-    this.notes = this.notesService.getAll();
-    this.filter("");
+    // this.notes = this.notesService.getAll();
+    // this.filter("");
+
+    this.notesService.getAll().subscribe((allNotes: Note[]) => {
+      this.notes = allNotes;
+      this.filter("");
+    });
+
 
   }
 
-  deleteNote(note: Note) {
-    let noteId = this.notesService.getId(note);
-    this.notesService.delete(noteId);
+  // deleteNote(note: Note) {
+    deleteNote(id: number) {
+    // let noteId = this.notesService.getId(note);
+    this.notesService.delete(id).subscribe((note: any) => {
+      location.reload();
+    });
     this.filter(this.filterInputElmtRef.nativeElement.value);
   }
 
-  generateNoteUrl(note: Note) {
-    let noteId = this.notesService.getId(note);
-    return noteId;
+  generateNoteUrl(id: number) {
+    return id;
 
   }
 
 
   filter(query: string) {
-    query = query.toLowerCase().trim();
+    if (query) {
+      query = query.toLowerCase().trim();
 
-    let allResults: Note[] = new Array<Note>();
-    let terms: string[] = query.split(" "); // split on spaces
-    terms = this.removeDuplicates(terms);
-    terms.forEach(element => {
-      let results: Note[] = this.relevantNotes(element);
-      allResults = [...allResults, ...results];
-    });
+      let allResults: Note[] = new Array<Note>();
+      let terms: string[] = query.split(" "); // split on spaces
+      terms = this.removeDuplicates(terms);
+      terms.forEach(element => {
+        let results: Note[] = this.relevantNotes(element);
+        allResults = [...allResults, ...results];
+      });
 
-    let uniqueResults = this.removeDuplicates(allResults);
-    this.filteredNotes = uniqueResults;
-    this.sortByRelevancy(allResults);
+      let uniqueResults = this.removeDuplicates(allResults);
+      this.filteredNotes = uniqueResults;
+      this.sortByRelevancy(allResults);
+    } else {
+      this.filteredNotes = this.notes;
+      console.log(this.filteredNotes)
+    }
+
 
 
   }
@@ -152,17 +166,17 @@ export class NotesListComponent implements OnInit {
     let noteCountObject: Object = {}; // noteId: number (note object id : count )
 
     searchResults.forEach(note => {
-      let noteId = this.notesService.getId(note);
-      if (noteCountObject[noteId]) {
-        noteCountObject[noteId] += 1;
+      // let noteId = this.notesService.getId(note);
+      if (noteCountObject[note.id]) {
+        noteCountObject[note.id] += 1;
       } else {
-        noteCountObject[noteId] = 1;
+        noteCountObject[note.id] = 1;
       }
     })
 
     this.filteredNotes = this.filteredNotes.sort((a: Note, b: Note) => {
-      let aId = this.notesService.getId(a);
-      let bId = this.notesService.getId(b);
+      let aId = a.id;
+      let bId = b.id;
 
       let aCount = noteCountObject[aId];
       let bCount = noteCountObject[bId];
